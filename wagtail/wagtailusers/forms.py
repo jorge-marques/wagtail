@@ -274,3 +274,11 @@ class NotificationPreferencesForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ("submitted_notifications", "approved_notifications", "rejected_notifications")
+
+
+def get_user_creation_form():
+    return UserCreationForm
+
+
+def get_user_edit_form():
+    return UserEditForm

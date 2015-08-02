@@ -9,7 +9,7 @@ from django.views.decorators.vary import vary_on_headers
 
 from wagtail.wagtailadmin import messages
 from wagtail.wagtailadmin.forms import SearchForm
-from wagtail.wagtailusers.forms import UserCreationForm, UserEditForm
+from wagtail.wagtailusers.forms import get_user_creation_form, get_user_edit_form
 from wagtail.wagtailcore.compat import AUTH_USER_APP_LABEL, AUTH_USER_MODEL_NAME
 
 User = get_user_model()
@@ -83,8 +83,9 @@ def index(request):
 
 @permission_required(change_user_perm)
 def create(request):
+    form_class = get_user_creation_form()
     if request.POST:
-        form = UserCreationForm(request.POST)
+        form = form_class(request.POST)
         if form.is_valid():
             user = form.save()
             messages.success(request, _("User '{0}' created.").format(user), buttons=[
@@ -94,7 +95,7 @@ def create(request):
         else:
             messages.error(request, _("The user could not be created due to errors."))
     else:
-        form = UserCreationForm()
+        form = form_class()
 
     return render(request, 'wagtailusers/users/create.html', {
         'form': form,
@@ -104,8 +105,9 @@ def create(request):
 @permission_required(change_user_perm)
 def edit(request, user_id):
     user = get_object_or_404(User, id=user_id)
+    form_class = get_user_edit_form()
     if request.POST:
-        form = UserEditForm(request.POST, instance=user)
+        form = form_class(request.POST, instance=user)
         if form.is_valid():
             user = form.save()
             messages.success(request, _("User '{0}' updated.").format(user), buttons=[
@@ -115,7 +117,7 @@ def edit(request, user_id):
         else:
             messages.error(request, _("The user could not be saved due to errors."))
     else:
-        form = UserEditForm(instance=user)
+        form = form_class(instance=user)
 
     return render(request, 'wagtailusers/users/edit.html', {
         'user': user,
